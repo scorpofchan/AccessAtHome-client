@@ -1,6 +1,5 @@
 #include "listener.h"
 
-
 Listener::Listener(QObject *parent) :
     QTcpServer(parent)
 {
@@ -9,13 +8,14 @@ Listener::Listener(QObject *parent) :
 void Listener::start()
 {
     int port = 4444;
-    if(!this->listen(QHostAddress::Any,port))
+    if(!this->listen(QHostAddress::LocalHost,port))
     {
         qDebug() << "Could not start server";
     }
     else
     {
         qDebug() << "Listening to port " << port << "...";
+
     }
 }
 
