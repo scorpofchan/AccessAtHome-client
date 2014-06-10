@@ -13,8 +13,7 @@ class Thread : public QThread
 {
     Q_OBJECT
 public:
-    explicit Thread(qintptr ID, QObject *parent = 0);
-
+    explicit Thread(qintptr , QObject *parent = 0);
     void run();
 
 signals:

@@ -1,5 +1,4 @@
 #include "rsabox.h"
-#include <QDebug>
 
 RSABox::RSABox() {
     ctx = NULL;
@@ -8,7 +7,7 @@ RSABox::RSABox() {
     dataLen = encLen = decLen = sigLen = 0;
 }
 
-int RSABox::genRsaKey() {
+int RSABox::genRsaKey(char *priv, char *pub) {
     if (ctx != NULL) freectx();
     if (pkey != NULL) freepkey();
     ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
@@ -16,6 +15,28 @@ int RSABox::genRsaKey() {
     if ((EVP_PKEY_keygen_init(ctx)) <= 0) goto gen_err;
     if ((EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, RSA_KEY_LEN)) <= 0) goto gen_err;
     if ((EVP_PKEY_keygen(ctx, &pkey)) <= 0) goto gen_err;
+    FILE *fp_priv = NULL;
+    fopen_s(&fp_priv, priv, "w");
+    if (fp_priv) {
+          if (!PEM_write_PrivateKey(fp_priv, pkey, NULL, NULL, 0, 0, NULL)) {
+               fclose(fp_priv);
+               fp_priv = NULL;
+               goto gen_err;
+          }
+          fclose(fp_priv);
+          fp_priv = NULL;
+    }
+    FILE *fp_pub = NULL;
+    fopen_s(&fp_pub, pub, "w");
+    if (fp_pub) {
+          if (!PEM_write_PUBKEY(fp_pub, pkey)) {
+             fclose(fp_pub);
+             fp_pub = NULL;
+             goto gen_err;
+          }
+          fclose(fp_pub);
+          fp_pub = NULL;
+    }
     freectx();
     return 1;
 gen_err:
@@ -24,9 +45,9 @@ gen_err:
     return 0;
 }
 
-int RSABox::setPrivKey() {
+int RSABox::setPrivKey(char *file) {
     FILE *f = NULL;
-    fopen_s(&f, "private.key", "r");
+    fopen_s(&f, file, "r");
     if (f) {
       if(privkey != NULL) freeprivkey();
       privkey = PEM_read_PrivateKey(f, &privkey, 0, 0);
@@ -37,9 +58,9 @@ int RSABox::setPrivKey() {
     return 0;
 }
 
-int RSABox::setPubKey() {
+int RSABox::setPubKey(char *file) {
       FILE *f = NULL;
-      fopen_s(&f, "public.key", "r");
+      fopen_s(&f, file, "r");
       if (f) {
         if(pubkey != NULL) freepubkey();
         if(!PEM_read_PUBKEY(f, &pubkey, NULL, NULL))

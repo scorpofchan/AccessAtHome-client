@@ -12,19 +12,25 @@
 
 #define RSA_KEY_LEN 4096
 #define MAX_LEN RSA_KEY_LEN/16
+#define PRIVATEKEY "keys/private.key"
+#define PUBLICKEY "keys/server.key"
+#define MYPUBLICKEY "keys/public.key"
 
 class RSABox
 {
 public:
   RSABox();
   ~RSABox();
-  int genRsaKey();
+  int genRsaKey(char *, char *);
   int rsaEncrypt();
   int rsaDecrypt();
   int rsaSign();
   int rsaVerify();
-  int setPrivKey();
-  int setPubKey();
+  int setPrivKey(char *);
+  int setPubKey(char *);
+  int setdata(char *, unsigned int);
+  int setenc(char *);
+  int setsig(char *);
   void freepkey();
   void freectx();
   void freeprivkey();
@@ -33,9 +39,6 @@ public:
   void freeenc();
   void freedec();
   void freesig();
-  int setdata(char *, unsigned int);
-  int setenc(char *);
-  int setsig(char *);
   unsigned char *getdata();
   unsigned char *getenc();
   unsigned char *getdec();

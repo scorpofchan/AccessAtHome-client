@@ -4,38 +4,54 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network sql
 
-INCLUDEPATH += C:/OpenSSL-Win32-Full/include C:/Python27/include
-LIBS += -L"C:/Python27/libs" -L"C:/OpenSSL-Win32-Full/lib" -llibeay32 -lssleay32
+INCLUDEPATH += C:/OpenSSL-Win32-Full/include
+LIBS += -L"C:/OpenSSL-Win32-Full/lib" -llibeay32 -lssleay32
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Core-client
 TEMPLATE = app
 
+
 SOURCES += main.cpp\
         mainwindow.cpp \
     aesbox.cpp \
-    downloader.cpp \
     listener.cpp \
     rsabox.cpp \
-    thread.cpp \
-    daemon.cpp \
     global.cpp \
-    client.cpp
+    client.cpp \
+    http.cpp \
+    database.cpp \
+    uploader.cpp \
+    window.cpp \
+    daemon.cpp \
+    handler.cpp \
+    job.cpp \
+    jobsmanger.cpp
 
 HEADERS  += mainwindow.h \
     aesbox.h \
-    downloader.h \
     listener.h \
     rsabox.h \
-    thread.h \
-    daemon.h \
     global.h \
     client.h \
-    main.h
+    main.h \
+    http.h \
+    database.h \
+    uploader.h \
+    window.h \
+    daemon.h \
+    handler.h \
+    job.h \
+    jobsmanger.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    window.ui
 
 OTHER_FILES += \
-    icon.png
+    icon.png \
+    https.txt
+
+RESOURCES += \
+    resources.qrc

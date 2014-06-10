@@ -1,11 +1,11 @@
 #include "thread.h"
 
 
-Thread::Thread(qintptr ID, QObject *parent) :
+Thread::Thread(qintptr sock, QObject *parent) :
     QThread(parent)
 {
     myfile.open("C:/Users/root/QtProjects/Core/a.txt");
-    this->socketDescriptor = ID;
+    this->socketDescriptor = sock;
 }
 
 void Thread::run()

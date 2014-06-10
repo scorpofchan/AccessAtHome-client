@@ -1,28 +1,23 @@
 #include "listener.h"
 
 Listener::Listener(QObject *parent) :
-    QTcpServer(parent)
-{
+    QTcpServer(parent) {
 }
 
-void Listener::start()
-{
+void Listener::start() {
     int port = 4444;
-    if(!this->listen(QHostAddress::LocalHost,port))
-    {
-        qDebug() << "Could not start server";
+    if(!this->listen(QHostAddress::Any, port)) {
+        qDebug() << "Could not start listen";
     }
-    else
-    {
-        qDebug() << "Listening to port " << port << "...";
-
+    else {
+        qDebug() << "Listening to port " << port;
     }
 }
 
-void Listener::incomingConnection(qintptr socketDescriptor)
-{
+void Listener::incomingConnection(qintptr socketDescriptor) {
     qDebug() << socketDescriptor << " Connecting...";
-    Thread *thread = new Thread(socketDescriptor, this);
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
+    handler = new Handler(socketDescriptor, this);
+    //connect(handler, SIGNAL(finish()), handler, SLOT(terminate()), Qt::DirectConnection);
+    //connect(handler, SIGNAL(finish()), handler, SLOT(deleteLater()));
+    handler->start();
 }
