@@ -36,6 +36,8 @@ bool Database::createTable() {
                   "code varchar(24) default '', "
                   "token varchar(100) default '', "
                   "status varchar(2) default '0', "
+                  "received varchar(2) default '0', "
+                  "finished varchar(2) default '0', "
                   "submit varchar(2) default '0')");
     if (getvalue("id", "user") != "1") query.exec(QString("insert into user(id) values(null)"));
     return ret;

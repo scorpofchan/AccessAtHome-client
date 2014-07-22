@@ -6,9 +6,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow), loginWindow(new Window)
 {
     ui->setupUi(this);
+    status = 0;
+    setWindowIcon(QIcon(":images/icon.gif"));
     //loginWindow->setFixedSize(width, height);
     //connect(ui->loginButton,SIGNAL(clicked()),this,SLOT(login()));
-    //connect(loginWindow,SIGNAL(logout()),this,SLOT(logout()));
+    connect(loginWindow,SIGNAL(logout()),this,SLOT(logout()));
 }
 
 MainWindow::~MainWindow()
@@ -29,16 +31,31 @@ void MainWindow::changeEvent(QEvent *e)
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent *event) {
+        hide();
+        event->ignore();
+}
+
+
 void MainWindow::login() {
     this->hide();
-    loginWindow->setGeometry((QDesktopWidget().screen()->width()/2)-(610/2),(QDesktopWidget().screen()->height()/2)-(350/2),610,350);
+    status = 0;
+    int width = 310;
+    int height = 440;
+    loginWindow->setFixedSize(width, height);
+    loginWindow->setGeometry((QDesktopWidget().screen()->width()/2)-(width/2),(QDesktopWidget().screen()->height()/2)-(height/2),width,height);
     loginWindow->show();
+    loginWindow->status = 1;
 }
 
 void MainWindow::logout() {
     loginWindow->hide();
-    this->setGeometry((QDesktopWidget().screen()->width()/2)-(610/2),(QDesktopWidget().screen()->height()/2)-(350/2),610,350);
+    loginWindow->status = 0;
+    int width = 310;
+    int height = 380;
+    setGeometry((QDesktopWidget().screen()->width()/2)-(width/2),(QDesktopWidget().screen()->height()/2)-(height/2),width,height);
     this->show();
+    status = 1;
 }
 
 void MainWindow::updateLogin(int status) {
@@ -123,6 +140,7 @@ void MainWindow::updateRegister(int status) {
 }
 
 void MainWindow::on_loginButton_clicked() {
+    login();
     if ((ui->loginEmail->text() != "") && (ui->loginPass->text() != "")) {
       if ((ui->loginPass->text().size() > 30) || (ui->loginEmail->text().size() > 30)) {
           ui->statusLogin->setText("Too long information");

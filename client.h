@@ -13,7 +13,7 @@
 #include <QNetworkProxy>
 
 //#define SERVER_HOST "192.168.158.1"
-#define SERVER_HOST "2hf66ivcirij7pjd.onion"
+#define SERVER_HOST "rchlie7hgfhecoi7.onion"
 #define SERVER_PORT 4444
 
 class Client : public QObject

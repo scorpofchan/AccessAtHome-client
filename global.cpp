@@ -1,52 +1,5 @@
 #include "global.h"
 
-void process(char *cmd){
-       STARTUPINFOA si;
-       PROCESS_INFORMATION pi;
-
-       ZeroMemory( &si, sizeof(si) );
-       si.cb = sizeof(si);
-       ZeroMemory( &pi, sizeof(pi) );
-
-
-       // Start the child process.
-       if( !CreateProcessA(NULL,   // No module name (use command line)
-           cmd,            // Command line
-           NULL,           // Process handle not inheritable
-           NULL,           // Thread handle not inheritable
-           FALSE,          // Set handle inheritance to FALSE
-           0,              // No creation flags
-           NULL,           // Use parent's environment block
-           NULL,           // Use parent's starting directory
-           &si,            // Pointer to STARTUPINFO structure
-           &pi )           // Pointer to PROCESS_INFORMATION structure
-       )
-       {
-           printf( "CreateProcess failed (%d).\n", GetLastError() );
-           return;
-       }
-
-       // Wait until child process exits.
-       WaitForSingleObject( pi.hProcess,INFINITE);
-
-       // Close process and thread handles.
-       CloseHandle( pi.hProcess );
-       CloseHandle( pi.hThread );
-}
-
-void execCmd(char *file, char *args, char *dir) {
-    //SetEnvironmentVariableA(reinterpret_cast<LPCSTR>(""), reinterpret_cast<LPCSTR>(""));
-    int nRet = (int)ShellExecuteA( 0,
-                                  reinterpret_cast<LPCSTR>("open"),
-                                  reinterpret_cast<LPCSTR>(file),
-                                  reinterpret_cast<LPCSTR>(args),
-                                  reinterpret_cast<LPCSTR>(dir),
-                                  SW_HIDE);
-    if ( nRet <= 32 ) {
-                qDebug() << nRet <<"Erorr !!";
-    }
-}
-
 void str2hex(unsigned char *dst, unsigned char *s, int len) {
         for (int i = 0; i < len; i++) _snprintf((char *)&dst[2*i], 3, "%02x", s[i]);
         dst[len*2] = 0;
@@ -166,3 +119,16 @@ QString dbselect(QString str) {
     db = NULL;
     return ret;
 }
+
+void addToStartup(char *name) {
+   TCHAR exepath[MAX_PATH];
+   GetModuleFileName(0, exepath, MAX_PATH);
+   HKEY hKey;
+   //LONG lnRes = RegOpenKeyExW(HKEY_CURRENT_USER,
+   //                          reinterpret_cast<LPCWSTR>("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"),
+   //                          0, KEY_WRITE, &hKey);
+   //if( ERROR_SUCCESS == lnRes ) {
+   //lnRes = RegSetValueExW(hKey, reinterpret_cast<LPCWSTR>(name), 0, REG_SZ, reinterpret_cast<BYTE*>(exepath), strlen((char*)exepath));
+   //}
+}
+

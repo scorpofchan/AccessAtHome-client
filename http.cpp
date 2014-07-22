@@ -142,5 +142,6 @@ void Http::finish(QString ip) {
 }
 
 void Http::finish() {
+    qDebug()<<"finishadsq";
     emit finished();
 }

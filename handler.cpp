@@ -180,7 +180,14 @@ void Handler::newjobHandler() {
     data.append((char *)command->data);
     qDebug()<<"[*] "<<data.mid(0,16);
     qDebug()<<"[*] "<<data.mid(16,48);
-    dbexec(QString("insert into jobs(code, token) values('" + data.mid(0,16) + "','" + data.mid(16) + "')"));
+    if (dbselect(QString("select code from jobs where code='" + data.mid(0,16) + "'")).compare(data.mid(0,16)) == 0) {
+        qDebug()<< "UPDATE JOB";
+        dbexec(QString("update jobs set token='" + data.mid(16) + "' where code='" + data.mid(0,16) + "'"));
+    }
+    else {
+        qDebug()<< "INSERT JOB";
+        dbexec(QString("insert into jobs(code, token) values('" + data.mid(0,16) + "','" + data.mid(16) + "')"));
+    }
     aes.setdata((char *)command->success, 1);
     ret = aes.aesEncrypt();
     if (ret != 0) {

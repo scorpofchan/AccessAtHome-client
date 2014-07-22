@@ -2,13 +2,14 @@
 #define MAINWINDOW_H
 #include "client.h"
 #include "uploader.h"
+#include "window.h"
 #include <time.h>
 #include <QThread>
 #include <QString>
 #include <QDebug>
+#include <QCloseEvent>
 #include <QMainWindow>
 #include <QDesktopWidget>
-#include "window.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,9 +22,12 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    Window *loginWindow;
+    int status;
 
 protected:
     void changeEvent(QEvent *e);
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void updateRegister(int);
@@ -37,7 +41,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    Window *loginWindow;
 };
 
 #endif // MAINWINDOW_H

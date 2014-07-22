@@ -5,6 +5,11 @@ Uploader::Uploader(QObject *parent) :
 {
 }
 
+Uploader::Uploader(QString _code, QString _output, QObject *parent) :
+    QObject(parent), code(_code), output(_output)
+{
+}
+
 void Uploader::sendkey() {
    QString email(getvalueDB("email", "user"));
    if (email == "") qDebug()<< "[*] SENDKEY FAILED";
@@ -56,6 +61,29 @@ void Uploader::sendkey() {
     connect(thread, SIGNAL(finished()), this, SLOT(finish()));
     thread->start();
    }
+}
+
+void Uploader::sendreport() {
+    qDebug()<< "[*] SEND REPORT";
+    QString data = "";
+    QString token(dbselect(QString("select token from jobs where code='" + code + "'")));
+    data = getvalueDB("email", "user");
+    data.append("\n");
+    data.append(code);
+    data.append("\n");
+    data.append(token);
+    QThread *thread = new QThread();
+    Client *client = new Client(SUBMITJOB, data);
+    Http *http = new Http(UPLOAD, URL_UPLOAD, QString("jobs/" + code + "/" + code + "/" + output), token);
+    http->moveToThread(thread);
+    connect(thread, SIGNAL(started()), http, SLOT(uploadFile()));
+    connect(http, SIGNAL(finished()), client, SLOT(start()));
+    connect(client, SIGNAL(finished()), thread, SLOT(quit()), Qt::DirectConnection);
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), client, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), http, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), this, SLOT(finish()));
+    thread->start();
 }
 
 void Uploader::finish() {

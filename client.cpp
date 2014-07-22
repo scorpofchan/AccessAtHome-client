@@ -123,12 +123,6 @@ int Client::doAction() {
      data = NULL;
      if (aes.getdec()[0] == command->success[0]) {
         qDebug() << "[*] OK";
-        if ((int)command->code[0] == NEWJOB) {
-            QString str = "";
-            str.append((char*)command->data + 18);
-            ret = str.indexOf("\n") + 1;
-            dbexec(QString("update jobs set submit='1' where code='" + str.mid(ret, 16) + "'"));
-        }
         if ((int)command->code[0] == SENDKEY) setvalueDB("key_status", "1", "user");
         if (((int)command->code[0] == LOGIN) || ((int)command->code[0] == ACTIVATE)) {
             data = NULL;
@@ -140,6 +134,18 @@ int Client::doAction() {
             setvalueDB("token", token, "user");
             free(data);
             data = NULL;
+        }
+        if ((int)command->code[0] == NEWJOB) {
+            QString str = "";
+            str.append((char*)command->data + 18);
+            ret = str.indexOf("\n") + 1;
+            dbexec(QString("update jobs set received='1' where code='" + str.mid(ret, 16) + "'"));
+        }
+        if ((int)command->code[0] == SUBMITJOB) {
+            QString str = "";
+            str.append((char*)command->data + 18);
+            ret = str.indexOf("\n") + 1;
+            dbexec(QString("update jobs set submit='1' where code='" + str.mid(ret, 16) + "'"));
         }
         return (int)command->success[0];
      }

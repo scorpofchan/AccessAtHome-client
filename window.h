@@ -1,6 +1,9 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "global.h"
+#include "jobinfo.h"
+#include <QCloseEvent>
 #include <QMainWindow>
 #include <QStandardItemModel>
 
@@ -15,12 +18,16 @@ class Window : public QMainWindow
 public:
     explicit Window(QWidget *parent = 0);
     ~Window();
+    int status;
 
 protected:
     void changeEvent(QEvent *e);
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void on_pushButton_clicked();
+    void doLogout();
+    void update();
 
 signals:
     void logout();

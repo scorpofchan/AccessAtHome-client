@@ -18,9 +18,9 @@
 
 //#define URL_IP "http://ipecho.net/plain"
 #define URL_IP "http://bot.whatismyipaddress.com"
-#define URL_UPLOAD "https://2hf66ivcirij7pjd.onion/up.php"
+#define URL_UPLOAD "https://rchlie7hgfhecoi7.onion/up.php"
 //#define URL_UPLOAD "https://192.168.158.1/up.php"
-#define URL_DOWNLOAD "https://2hf66ivcirij7pjd.onion"
+#define URL_DOWNLOAD "https://rchlie7hgfhecoi7.onion"
 //#define URL_DOWNLOAD "https://192.168.158.1"
 #define URL_INFO "http://api.ipaddresslabs.com/iplocation/v1.7/locateip?key=demo&format=json&ip="
 #define IP_RAW 1

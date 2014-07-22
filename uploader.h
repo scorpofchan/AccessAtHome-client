@@ -12,15 +12,19 @@ class Uploader : public QObject
     Q_OBJECT
 public:
     explicit Uploader(QObject *parent = 0);
+    Uploader::Uploader(QString, QString, QObject *parent = 0);
 
 signals:
     void finished();
 
 public slots:
     void sendkey();
+    void sendreport();
     void finish();
     void hello();
 private:
+    QString code;
+    QString output;
 
 };
 
