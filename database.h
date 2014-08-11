@@ -1,25 +1,21 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <QObject>
-#include <QDebug>
+#include <QSqlQuery>
 #include <QSqlDatabase>
 #include <QSqlError>
-#include <QSqlQuery>
+#include <QDebug>
 
 class Database
 {
 public:
-        //~Database();
-        bool open();
-        void close();
-        bool createTable();
-        QString getvalue(QString, QString);
-        bool setvalue(QString, QString, QString);
-        QSqlError lastError();
+        static bool open();
+        static void close();
+        static void setDB();
+        static bool createTables();
 
-private:
-        QSqlDatabase *db;
+        static QSqlDatabase *db;
 };
+
 
 #endif // DATABASE_H

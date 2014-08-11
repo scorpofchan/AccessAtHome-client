@@ -3,17 +3,17 @@
 
 #define NOMINMAX
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include "database.h"
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 #include <windows.h>
 #include <tchar.h>
-#include "database.h"
 
-#include <QDebug>
 #include <QTcpServer>
+
+#pragma comment(lib, "shell32.lib")
+#pragma comment(lib, "User32.lib")
+#pragma comment(lib, "Kernel32.lib")
 
 #define OK "OK"
 #define HELLO "HELLO"
@@ -43,10 +43,6 @@
 #define SUBMITJOB_FAILED 221
 #define NONCE 101
 
-#pragma comment(lib, "shell32.lib")
-#pragma comment(lib, "User32.lib")
-#pragma comment(lib, "Kernel32.lib")
-
 void str2hex(unsigned char *, unsigned char *, int);
 void hex2str(unsigned char *, unsigned char *, int);
 int isEqual(unsigned char *, unsigned char *, int);
@@ -54,8 +50,8 @@ bool localPortIsOpen(QHostAddress, quint16);
 int sha256(unsigned char *, char *, int);
 int sha256_file(char *, unsigned char *);
 int randbytes(unsigned char *, int);
-bool setvalueDB(QString, QString, QString);
-QString getvalueDB(QString, QString);
+//bool setvalueDB(QString, QString, QString);
+//QString getvalueDB(QString, QString);
 bool dbexec(QString);
 QString dbselect(QString);
 void addToStartup(char *);

@@ -1,7 +1,6 @@
 #ifndef LISTENER_H
 #define LISTENER_H
 
-#include <QtNetwork/QTcpServer>
 #include "handler.h"
 
 class Listener : public QTcpServer

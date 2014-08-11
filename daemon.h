@@ -3,12 +3,6 @@
 
 #include "global.h"
 #include "listener.h"
-#include "uploader.h"
-#include <QThread>
-#include <QObject>
-#include <QProcess>
-#include <QFileInfo>
-#include <QDir>
 
 class Daemon : public QObject
 {
@@ -26,10 +20,6 @@ public slots:
     void startListener();
     void startTor();
     void init();
-    void checkStatus();
-    void finish(int);
-    void finish();
-    void hello();
 
 };
 

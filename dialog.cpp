@@ -6,13 +6,13 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon(":images/icon.gif"));
     setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
     status = 0;
     QTimer *timer = new QTimer(this);
     timer->start(4000);
     for (int i = 0; i < 20; i++)
     timer->singleShot(i * 500, this, SLOT(updateStatus()));
-    setWindowIcon(QIcon(":images/icon.gif"));
 }
 
 void Dialog::closeEvent(QCloseEvent *event) {

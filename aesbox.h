@@ -1,9 +1,6 @@
 #ifndef AESBOX_H
 #define AESBOX_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 #include <openssl/pem.h>

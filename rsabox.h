@@ -1,9 +1,6 @@
 #ifndef RSABOX_H
 #define RSABOX_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
@@ -12,6 +9,7 @@
 
 #define RSA_KEY_LEN 4096
 #define MAX_LEN RSA_KEY_LEN/16
+
 #define PRIVATEKEY "keys/private.key"
 #define PUBLICKEY "keys/server.key"
 #define MYPUBLICKEY "keys/public.key"

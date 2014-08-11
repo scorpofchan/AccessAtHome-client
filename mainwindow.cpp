@@ -2,25 +2,21 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow), loginWindow(new Window)
+    QMainWindow(parent), ui(new Ui::MainWindow), loginWindow(new Window)
 {
+    this->status = 0;
     ui->setupUi(this);
-    status = 0;
     setWindowIcon(QIcon(":images/icon.gif"));
-    //loginWindow->setFixedSize(width, height);
     //connect(ui->loginButton,SIGNAL(clicked()),this,SLOT(login()));
     connect(loginWindow,SIGNAL(logout()),this,SLOT(logout()));
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete loginWindow;
     delete ui;
 }
 
-void MainWindow::changeEvent(QEvent *e)
-{
+void MainWindow::changeEvent(QEvent *e) {
     QMainWindow::changeEvent(e);
     switch (e->type()) {
     case QEvent::LanguageChange:
@@ -39,13 +35,16 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::login() {
     this->hide();
-    status = 0;
+    this->status = 0;
     int width = 310;
     int height = 440;
     loginWindow->setFixedSize(width, height);
     loginWindow->setGeometry((QDesktopWidget().screen()->width()/2)-(width/2),(QDesktopWidget().screen()->height()/2)-(height/2),width,height);
     loginWindow->show();
     loginWindow->status = 1;
+    ui->statusLogin->clear();
+    ui->statusRegister->clear();
+    ui->statusActivate->clear();
 }
 
 void MainWindow::logout() {
@@ -55,13 +54,12 @@ void MainWindow::logout() {
     int height = 380;
     setGeometry((QDesktopWidget().screen()->width()/2)-(width/2),(QDesktopWidget().screen()->height()/2)-(height/2),width,height);
     this->show();
-    status = 1;
+    this->status = 1;
 }
 
 void MainWindow::updateLogin(int status) {
     switch (status) {
       case LOGIN_SUCCEED:
-        //ui->statusLogin->setText("Login succeed");
         login();
         break;
       case LOGIN_FAILED:
@@ -85,11 +83,11 @@ void MainWindow::updateActivate(int status) {
     switch (status) {
       case ACTIVATE_SUCCEED:
         ui->statusActivate->setText("Activation succeed");
-        setvalueDB("email", ui->activateEmail->text(), "user");
+        dbexec("update user set email='" + ui->activateEmail->text() + "'");
         thread = new QThread;
         uploader = new Uploader;
         uploader->moveToThread(thread);
-        connect(thread, SIGNAL(started()), uploader, SLOT(sendkey()));
+        connect(thread, SIGNAL(started()), uploader, SLOT(sendKey()));
         connect(uploader, SIGNAL(finished()), thread, SLOT(quit()), Qt::DirectConnection);
         connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
         connect(thread, SIGNAL(finished()), uploader, SLOT(deleteLater()));
@@ -140,7 +138,7 @@ void MainWindow::updateRegister(int status) {
 }
 
 void MainWindow::on_loginButton_clicked() {
-    login();
+    //login();
     if ((ui->loginEmail->text() != "") && (ui->loginPass->text() != "")) {
       if ((ui->loginPass->text().size() > 30) || (ui->loginEmail->text().size() > 30)) {
           ui->statusLogin->setText("Too long information");

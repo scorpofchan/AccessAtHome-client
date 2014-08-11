@@ -50,20 +50,6 @@
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="1">
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>INFO</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="pushButton_2">
-        <property name="text">
-         <string>DELETE</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0" colspan="2">
        <widget class="QTableView" name="tableView">
         <property name="minimumSize">
@@ -77,6 +63,20 @@
           <width>511</width>
           <height>16777215</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="infoButton">
+        <property name="text">
+         <string>INFO</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="deleteButton">
+        <property name="text">
+         <string>DELETE</string>
         </property>
        </widget>
       </item>
@@ -97,32 +97,32 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionClose"/>
+    <addaction name="Close"/>
    </widget>
    <widget class="QMenu" name="menuProfile">
     <property name="title">
      <string>Profile</string>
     </property>
-    <addaction name="actionLogout_2"/>
+    <addaction name="Logout"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="actionSettings_2"/>
+    <addaction name="Settings"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout_2"/>
+    <addaction name="About"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProfile"/>
    <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
   </widget>
-  <action name="actionClose">
+  <action name="Close">
    <property name="text">
     <string>Close</string>
    </property>
@@ -142,17 +142,17 @@
     <string>Logout</string>
    </property>
   </action>
-  <action name="actionSettings_2">
+  <action name="Settings">
    <property name="text">
     <string>Settings</string>
    </property>
   </action>
-  <action name="actionAbout_2">
+  <action name="About">
    <property name="text">
     <string>About</string>
    </property>
   </action>
-  <action name="actionLogout_2">
+  <action name="Logout">
    <property name="text">
     <string>Logout</string>
    </property>

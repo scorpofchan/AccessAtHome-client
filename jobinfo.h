@@ -17,6 +17,10 @@ public:
     void setname(QString);
     void setdescription(QString);
 
+private slots:
+    void on_closeButton_clicked();
+    void on_nextButton_clicked();
+
 private:
     Ui::JobInfo *ui;
 };

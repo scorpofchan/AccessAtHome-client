@@ -1,38 +1,33 @@
 #include "client.h"
 
-Client::Client(QObject *parent) :
-    QObject(parent) {
-
+Client::Client(int _cmd, QString _payload, QObject *parent) : QObject(parent) {
+    cmd = _cmd;
+    payload = _payload;
 }
 
-Client::Client(int _cmd, QString _data, QObject *parent) :
-    QObject(parent) {
+void Client::start() {
     aes.aesInit();
     rsa.setPrivKey(PRIVATEKEY);
     rsa.setPubKey(PUBLICKEY);
     command = NULL;
     command = (_command *)malloc(sizeof(_command));
     if (command == NULL) return;
-    command->code[0] = (unsigned char)_cmd;
-    command->success[0] = (unsigned char)(_cmd + 1);
-    command->fail[0] = (unsigned char)(_cmd + 2);
+    command->code[0] = (unsigned char)cmd;
+    command->success[0] = (unsigned char)(cmd + 1);
+    command->fail[0] = (unsigned char)(cmd + 2);
     command->nonce_err[0] = (unsigned char)NONCE;
     memset(command->data, 0, 2048);
-    if (_cmd == SENDKEY) {
-        command->size = 512 + 64 + getvalueDB("email", "user").length();
-        hex2str(command->data + 18, (unsigned char *)_data.toStdString().c_str(), command->size);
+    if (cmd == SENDKEY) {
+        command->size = 512 + 64 + dbselect("select email from user").length();
+        hex2str(command->data + 18, (unsigned char *)payload.toStdString().c_str(), command->size);
     }
     else {
-        command->size = strlen(_data.toStdString().c_str());
-        memcpy((char *)command->data + 18, _data.toStdString().c_str(), command->size);
+        command->size = strlen(payload.toStdString().c_str());
+        memcpy((char *)command->data + 18, payload.toStdString().c_str(), command->size);
         command->data[command->size + 18] = 0;
     }
     command->data[0] = command->code[0];
     command->data[17] = '\n';
-}
-
-void Client::start() {
-    if (command == NULL) return;
     socket = new QTcpSocket(this);
     QNetworkProxy proxy;
     proxy.setType(QNetworkProxy::Socks5Proxy);
@@ -40,16 +35,14 @@ void Client::start() {
     proxy.setPort(9250);
     QNetworkProxy::setApplicationProxy(proxy);
     socket->connectToHost(SERVER_HOST, SERVER_PORT);
-    if (socket->waitForConnected(10000)) {
-        int ret;
-        ret = handshake();
-        if (ret == 1) finish(doAction());
+    if (socket->waitForConnected(30000)) {
+        if (handshake()== 1) finish(doAction());
         else finish(0);
         socket->close();
         delete socket;
     }
     else {
-        qDebug() << "Error: " << socket->errorString();
+        qDebug() << "[*] Error:" << socket->errorString();
         finish(0);
         delete socket;
     }
@@ -112,7 +105,7 @@ int Client::doAction() {
      qDebug() << "[*] Reading:" << ret;
      if (ret < 1) {
          qDebug() << "[*] ERROR";
-         if ((int)command->code[0] == SENDKEY) setvalueDB("key_status", "0", "user");
+         if ((int)command->code[0] == SENDKEY) dbexec("update user set key_status='0'");
          free(data);
          data = NULL;
          return 0;
@@ -123,7 +116,7 @@ int Client::doAction() {
      data = NULL;
      if (aes.getdec()[0] == command->success[0]) {
         qDebug() << "[*] OK";
-        if ((int)command->code[0] == SENDKEY) setvalueDB("key_status", "1", "user");
+        if ((int)command->code[0] == SENDKEY) dbexec("update user set key_status='1'");
         if (((int)command->code[0] == LOGIN) || ((int)command->code[0] == ACTIVATE)) {
             data = NULL;
             data = (unsigned char*)malloc(64);
@@ -131,7 +124,7 @@ int Client::doAction() {
             QString token = "";
             str2hex((unsigned char*)data, aes.getdec()+1, 16);
             token.append((char*)data);
-            setvalueDB("token", token, "user");
+            dbexec(QString("update user set token='" + token + "'"));
             free(data);
             data = NULL;
         }
@@ -151,20 +144,15 @@ int Client::doAction() {
      }
      else if (aes.getdec()[0] == command->fail[0]) {
         qDebug() << "[*] BAD";
-        if ((int)command->code[0] == SENDKEY) setvalueDB("key_status", "0", "user");
+        if ((int)command->code[0] == SENDKEY) dbexec("update user set key_status='0'");
         return (int)command->fail[0];
      }
      else if (aes.getdec()[0] == command->nonce_err[0]) {
         qDebug() << "[*] BAD NONCE";
-        if ((int)command->code[0] == SENDKEY) setvalueDB("key_status", "0", "user");
+        if ((int)command->code[0] == SENDKEY) dbexec("update user set key_status='0'");
         return 0;
      }
      return 0;
-}
-
-void Client::genkey() {
-     rsa.genRsaKey(PRIVATEKEY,MYPUBLICKEY);
-     finish();
 }
 
 void Client::finish(int ret) {
@@ -173,8 +161,4 @@ void Client::finish(int ret) {
 
 void Client::finish() {
     emit finished();
-}
-
-void Client::hello() {
-    qDebug()<<"hello";
 }

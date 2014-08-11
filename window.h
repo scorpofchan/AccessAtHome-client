@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "jobinfo.h"
+
 #include <QCloseEvent>
 #include <QMainWindow>
 #include <QStandardItemModel>
@@ -24,13 +25,14 @@ protected:
     void changeEvent(QEvent *e);
     void closeEvent(QCloseEvent *event);
 
-private slots:
-    void on_pushButton_clicked();
+public slots:
+    void on_infoButton_clicked();
     void doLogout();
     void update();
 
 signals:
     void logout();
+    void doUpdate();
 
 private:
     Ui::Window *ui;

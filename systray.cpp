@@ -61,7 +61,8 @@ void Systray::showNormal() {
 }
 
 void Systray::update() {
-   qDebug()<<"updateeee!";
+    qDebug()<<"[*] Update !!";
+     mainwindow.loginWindow->update();
 }
 
 void Systray::activate(QSystemTrayIcon::ActivationReason reason) {

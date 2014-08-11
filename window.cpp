@@ -2,14 +2,14 @@
 #include "ui_window.h"
 
 Window::Window(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::Window)
+    QMainWindow(parent), ui(new Ui::Window)
 {
     ui->setupUi(this);
-    status = 0;
-    connect(ui->actionLogout_2, SIGNAL(triggered()), this, SLOT(doLogout()));
     setWindowIcon(QIcon(":images/icon.gif"));
-    model = new QStandardItemModel(dbselect("SELECT Count(*) FROM jobs").toInt(),2,this);
+    status = 0;
+    connect(ui->Logout, SIGNAL(triggered()), this, SLOT(doLogout()));
+    connect(this, SIGNAL(doUpdate()), ui->tableView, SLOT(update()));
+    model = new QStandardItemModel(dbselect("SELECT Count(*) FROM jobs").toInt(), 2, this);
     model->setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
     model->setHeaderData(1, Qt::Horizontal, QObject::tr("Status"));
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -19,11 +19,26 @@ Window::Window(QWidget *parent) :
     ui->tableView->horizontalHeader()->setHighlightSections(false);
     ui->tableView->verticalHeader()->hide();
     ui->tableView->resizeColumnsToContents();
-    update();
+    Database *db = new Database;
+    if (db->open()) {
+        QSqlQuery query(QString("select name, status from jobs"));
+        int index = 0;
+        while (query.next()) {
+            qDebug()<<"[*] "<<query.value(0).toString();
+            model->setData(model->index(index, 0, QModelIndex()), query.value(0).toString());
+            model->setData(model->index(index, 1, QModelIndex()), query.value(1).toString().compare("0") ? "Running" : "Not running");
+            index++;
+        }
+        db->close();
+    }
+    delete db;
+    db = NULL;
+    ui->tableView->setModel(model);
+    for (int i = 0; i < ui->tableView->horizontalHeader()->count(); ++i)
+        ui->tableView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
 }
 
-Window::~Window()
-{
+Window::~Window() {
     delete ui;
 }
 
@@ -44,18 +59,17 @@ void Window::closeEvent(QCloseEvent *event) {
         event->ignore();
 }
 
-void Window::on_pushButton_clicked() {
-    if(ui->tableView->selectionModel()->hasSelection()){
-    int index = ui->tableView->selectionModel()->currentIndex().row();
-    QString name(model->data(model->index(index, 0, QModelIndex())).toString());
-    JobInfo *info = new JobInfo();
-    info->setWindowTitle(name);
-    info->setModal(true);
-    info->setname(name);
-    info->setdescription(dbselect(QString("select description from jobs where name='") + name + QString("'")));
-    info->show();
+void Window::on_infoButton_clicked() {
+    if(ui->tableView->selectionModel()->hasSelection()) {
+        int index = ui->tableView->selectionModel()->currentIndex().row();
+        QString name(model->data(model->index(index, 0, QModelIndex())).toString());
+        JobInfo *info = new JobInfo();
+        info->setModal(true);
+        info->setname(name);
+        info->setWindowTitle(name);
+        info->setdescription(dbselect(QString("select description from jobs where name='") + name + QString("'")));
+        info->show();
     }
-    //emit logout();
 }
 
 void Window::doLogout() {
@@ -63,19 +77,20 @@ void Window::doLogout() {
 }
 
 void Window::update() {
+    qDebug()<<"[*] Update Job list";
     Database *db = new Database;
-    if (!db->open()) return;
-    QSqlQuery query(QString("select name, status, code from jobs"));
-    int index = 0;
-    while (query.next()) {
-        model->setData(model->index(index, 0, QModelIndex()), query.value(0).toString());
-        model->setData(model->index(index, 1, QModelIndex()), query.value(1).toString().compare("0") ? "Running" : "Not running");
-        index++;
+    if (db->open()) {
+        QSqlQuery query(QString("select name, status from jobs"));
+        int index = 0;
+        model->removeRows(0,model->rowCount());
+        while (query.next()) {
+            model->insertRow(model->rowCount());
+            model->setData(model->index(index, 0, QModelIndex()), query.value(0).toString());
+            model->setData(model->index(index, 1, QModelIndex()), query.value(1).toString().compare("0") ? "Running" : "Not running");
+            index++;
+        }
+        db->close();
     }
-    ui->tableView->setModel(model);
-    for (int i = 0; i < ui->tableView->horizontalHeader()->count(); ++i)
-        ui->tableView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
-    db->close();
     delete db;
     db = NULL;
 }

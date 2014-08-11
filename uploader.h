@@ -2,10 +2,6 @@
 #define UPLOADER_H
 
 #include "http.h"
-#include "client.h"
-#include <QObject>
-#include <QDebug>
-
 
 class Uploader : public QObject
 {
@@ -18,13 +14,14 @@ signals:
     void finished();
 
 public slots:
-    void sendkey();
-    void sendreport();
+    void genKey();
     void finish();
-    void hello();
+    void sendKey();
+    void sendReport();
+
 private:
     QString code;
-    QString output;
+    QString outputFile;
 
 };
 

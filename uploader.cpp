@@ -1,19 +1,22 @@
 #include "uploader.h"
 
-Uploader::Uploader(QObject *parent) :
-    QObject(parent)
-{
+Uploader::Uploader(QObject *parent) : QObject(parent) {}
+
+Uploader::Uploader(QString _code, QString _outputFile, QObject *parent) : QObject(parent) {
+    code =_code;
+    outputFile =_outputFile;
 }
 
-Uploader::Uploader(QString _code, QString _output, QObject *parent) :
-    QObject(parent), code(_code), output(_output)
-{
+void Uploader::genKey() {
+     RSABox *rsa = new RSABox;
+     if (rsa->genRsaKey(PRIVATEKEY, MYPUBLICKEY)) dbexec("update user set key='1'");
+     delete rsa;
+     emit finished();
 }
 
-void Uploader::sendkey() {
-   QString email(getvalueDB("email", "user"));
-   if (email == "") qDebug()<< "[*] SENDKEY FAILED";
-   else {
+void Uploader::sendKey() {
+   QString email(dbselect("select email from user"));
+   if ((email != "") && (dbselect("select key_status from user") != "1")) {
     unsigned char *tmp = NULL;
     unsigned char *rand = NULL;
     unsigned char *checksum = NULL;
@@ -63,18 +66,18 @@ void Uploader::sendkey() {
    }
 }
 
-void Uploader::sendreport() {
+void Uploader::sendReport() {
     qDebug()<< "[*] SEND REPORT";
     QString data = "";
     QString token(dbselect(QString("select token from jobs where code='" + code + "'")));
-    data = getvalueDB("email", "user");
+    data = dbselect("select email from user");
     data.append("\n");
     data.append(code);
     data.append("\n");
     data.append(token);
     QThread *thread = new QThread();
     Client *client = new Client(SUBMITJOB, data);
-    Http *http = new Http(UPLOAD, URL_UPLOAD, QString("jobs/" + code + "/" + code + "/" + output), token);
+    Http *http = new Http(UPLOAD, URL_UPLOAD, QString("jobs/" + code + "/" + code + "/" + outputFile), token);
     http->moveToThread(thread);
     connect(thread, SIGNAL(started()), http, SLOT(uploadFile()));
     connect(http, SIGNAL(finished()), client, SLOT(start()));
@@ -87,9 +90,5 @@ void Uploader::sendreport() {
 }
 
 void Uploader::finish() {
-        emit finished();
-}
-
-void Uploader::hello() {
-        qDebug() << "hello";
+   emit finished();
 }

@@ -319,25 +319,25 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionClose"/>
+    <addaction name="Close"/>
    </widget>
    <widget class="QMenu" name="menuOption">
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="actionSettings"/>
+    <addaction name="Settings"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout"/>
+    <addaction name="About"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOption"/>
    <addaction name="menuHelp"/>
   </widget>
-  <action name="actionAbout">
+  <action name="About">
    <property name="checkable">
     <bool>false</bool>
    </property>
@@ -345,12 +345,12 @@
     <string>About</string>
    </property>
   </action>
-  <action name="actionSettings">
+  <action name="Settings">
    <property name="text">
     <string>Settings</string>
    </property>
   </action>
-  <action name="actionClose">
+  <action name="Close">
    <property name="text">
     <string>Close</string>
    </property>

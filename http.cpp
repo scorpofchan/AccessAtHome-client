@@ -1,12 +1,10 @@
 #include "http.h"
 
-Http::Http(int _cmd, QString _url, QString _filename, QString _dst, QObject *parent) :
-    QObject(parent)
-{
+Http::Http(int _cmd, QString _url, QString _filename, QString _dst, QObject *parent) : QObject(parent) {
     cmd = _cmd;
     url = _url;
-    filename = _filename;
     dst = _dst;
+    filename = _filename;
     manager = new QNetworkAccessManager(this);
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     proxy.setHostName("127.0.0.1");
@@ -117,14 +115,13 @@ void Http::replyFinished (QNetworkReply *reply) {
               info.append(in.readLine());
               file.close();
               info.append("\", \"email\" : \"");
-              info.append(getvalueDB("email", "user"));
+              info.append(dbselect("select email from user"));
               info.append("\", \"token\" : \"");
-              info.append(getvalueDB("token", "user"));
-              //info.append("aaaaaaaaaaaaaaaaaaaaaaaaa");
+              info.append(dbselect("select token from user"));
               info.append("\", \"cc\" : \"");
               info.append(jsonObject["country_code_iso3166alpha2"].toString());
               info.append("\" }");
-              qDebug() << "data : "<<info;
+              qDebug() << "[*] Data : "<<info;
               Client *client;
               client = new Client(INFO, info);
               client->start();
@@ -142,6 +139,5 @@ void Http::finish(QString ip) {
 }
 
 void Http::finish() {
-    qDebug()<<"finishadsq";
     emit finished();
 }

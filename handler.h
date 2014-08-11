@@ -4,11 +4,7 @@
 #include "global.h"
 #include "rsabox.h"
 #include "aesbox.h"
-#include "http.h"
 #include "job.h"
-#include <QThread>
-#include <QtNetwork/QTcpSocket>
-#include <QDebug>
 #include <QDir>
 
 using namespace std;
@@ -31,7 +27,6 @@ public slots:
     void disconnected();
     void handler(unsigned char *, int);
     void newjobHandler();
-    void hello();
 
 private:
     QTcpSocket *socket;

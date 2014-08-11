@@ -2,8 +2,6 @@
 #define JOBSMANAGER_H
 
 #include "job.h"
-#include "database.h"
-#include <QObject>
 #include <QQueue>
 
 class JobsManager : public QObject

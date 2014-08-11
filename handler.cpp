@@ -35,15 +35,15 @@ void Handler::requestHandler() {
 
 int Handler::handshake() {
     qDebug()<<"[*] Handshake";
-    int ret;
-    unsigned char *ack;
-    ack = NULL;
+    int ret = 0;
+    char *data = NULL;
+    unsigned char *ack = NULL;
+    unsigned char *buffer = NULL;
+    int nloop = 0;
     ret = rsa.setPrivKey((char *)PRIVATEKEY);
     if (ret == 0) goto hs_err;
-    char *data = NULL;
     data = (char*)malloc(512);
     ret = 0;
-    int nloop = 0;
     while ((ret < 512) && (nloop < 12)) {
         int nbytes = 0;
         nbytes = socket->read((char *)(data + ret), 512 - ret);
@@ -61,8 +61,8 @@ int Handler::handshake() {
     ack = (unsigned char*)malloc(18);
     if (ack == NULL) goto hs_err;
     ret = randbytes(ack + 2, 16);
-    ack[0] = 'O'; ack[1] = 'K';
     if (ret == 0) goto hs_err;
+    ack[0] = 'O'; ack[1] = 'K';
     aes.setdata((char *)ack, 18);
     ret = aes.aesEncrypt();
     if (ret == 0) goto hs_err;
@@ -70,8 +70,6 @@ int Handler::handshake() {
     //if (socket->write((char*)aes.getenc(), ret) != ret) goto hs_err;
     socket->write((char*)aes.getenc(), ret);
     socket->waitForBytesWritten(10000);
-    unsigned char *buffer;
-    buffer = NULL;
     buffer = (unsigned char*)malloc(1024);
     if (buffer == NULL) goto hs_err;
     socket->waitForReadyRead(10000);
@@ -119,7 +117,7 @@ void Handler::handler(unsigned char * buffer, int ret) {
     aes.setenc((char *)buffer, ret);
     ret = aes.aesDecrypt();
     qDebug() << "[LEN] " << ret;
-    if ((ret < 18) && (ret < 2048)) {
+    if ((ret < 18) && (ret >= 2048)) {
         aes.freeenc();
         aes.freedec();
         socket->close();
@@ -130,7 +128,7 @@ void Handler::handler(unsigned char * buffer, int ret) {
     command->success[0] = aes.getdec()[0] + 1;
     command->fail[0] = aes.getdec()[0] + 2;
     command->size = ret - 18;
-    qDebug()<< "[CODE] " << (int)command->code[0];
+    qDebug() << "[CODE] " << (int)command->code[0];
     if (isEqual(command->nonce, aes.getdec() + 1, 16)) {
         qDebug() << "[OK] NONCE";
         memcpy(command->data, aes.getdec() + 18, ret - 18);
@@ -160,7 +158,6 @@ void Handler::handler(unsigned char * buffer, int ret) {
     switch ((int) command->code[0]) {
             case NEWJOB:
               newjobHandler();
-
               break;
             default:
               //printf("[FREEEE]\n");
@@ -210,24 +207,6 @@ void Handler::newjobHandler() {
     QObject::connect(thread, SIGNAL(finished()), job, SLOT(deleteLater()));
     QObject::connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
-    //emit finish();
-}
-
-void Handler::hello() {
-    qDebug() << "[*] HELLO";
-    int ret = 0;
-    QString s;
-    s.append((char *)command->data);
-    qDebug()<<s;
-    aes.setdata((char *)command->success, 1);
-    ret = aes.aesEncrypt();
-    if (ret != 0) {
-        ret = socket->write((char*)aes.getenc(), ret);
-        socket->waitForBytesWritten(10000);
-    }
-    aes.freedata();
-    aes.freeenc();
-    socket->close();
     //emit finish();
 }
 

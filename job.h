@@ -1,12 +1,8 @@
 #ifndef JOB_H
 #define JOB_H
 
-#include "http.h"
 #include "uploader.h"
 #include <QProcess>
-#include <QString>
-#include <Qdebug>
-#include <QObject>
 
 class Job : public QObject
 {
@@ -16,7 +12,6 @@ public:
     int checksum();
 
 signals:
-    void finished(QString);
     void finished();
     void send();
 

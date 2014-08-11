@@ -2,9 +2,9 @@
 #define SYSTRAY_H
 
 #include "mainwindow.h"
+
 #include <QMenu>
 #include <QTimer>
-#include <QObject>
 #include <QAction>
 #include <QSystemTrayIcon>
 

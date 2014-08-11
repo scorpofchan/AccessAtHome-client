@@ -39,7 +39,6 @@ HEADERS  += mainwindow.h \
     rsabox.h \
     global.h \
     client.h \
-    main.h \
     http.h \
     database.h \
     uploader.h \
